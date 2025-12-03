@@ -5,9 +5,9 @@ export default function SignUpScreen() {
   return (
     <View style={styles.container}>
       <SignUp
-        routing="path"
-        path="/sign-up"
-        signInUrl="/sign-in"
+        routing="virtual"
+        signInUrl="/(auth)/sign-in"
+        afterSignUpUrl="/(tabs)"
       />
     </View>
   );
@@ -19,5 +19,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#fff',
+    padding: 20,
   },
 });
