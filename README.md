@@ -1,6 +1,25 @@
-# Welcome to your Expo app 👋
+# Voca
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A mobile-first voice application built with Expo.
+
+## System Architecture
+
+### Root domain (myvoca.io)
+- Public marketing surface (Lovable)
+- Fully static, cacheable, SEO-optimized
+- No authentication or app state
+
+### Application subdomain (app.myvoca.io)
+- All authenticated experiences
+- Expo web app
+- PWA manifest + service worker
+- Separate origin for clean cookie scoping and CSP
+
+### User Flow
+1. Landing page CTA → `app.myvoca.io`
+2. Sign-up/sign-in occurs entirely on `app.myvoca.io`
+
+This minimizes cross-origin redirects and aligns with Google's best practice for app boundary separation.
 
 ## Get started
 
