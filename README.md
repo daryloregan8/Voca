@@ -1,6 +1,30 @@
 # Voca
 
-A mobile-first voice application built with Expo.
+A new kind of expressive communication tool for people who are deaf, hard-of-hearing, or non-speaking.
+
+## What is Voca?
+
+Most assistive apps today focus on utility — transcription, captions, basic text-to-speech. They help you communicate the content of what you want to say, but not the feeling. Voice is more than words. It carries warmth, humour, intent, personality, softness, drama. For people who rely only on text, that emotional range often gets lost, leaving conversations feeling flat or limited. **Voca gives that expression back.**
+
+With Voca, you can write what you want to say, choose the tone, choose the voice — even clone your own — and generate a message that sounds exactly the way you intend. Gentle for a friend, professional at work, playful for your kids, flirty for a date. You can save it, play it aloud in person, or share it instantly as a voice note on WhatsApp, Instagram, iMessage, LinkedIn, and more.
+
+### Core Features
+
+**Two Modes:**
+- **Voice Note Mode** - Create expressive voice messages to share anywhere
+- **Real-time Conversation Mode** - Live back-and-forth where you speak through Voca and receive transcribed voice replies
+
+**Expression Tools:**
+- Text-to-speech with tone and emotion selection
+- Voice cloning for personalized expression
+- Video lip-sync/dubbing with your chosen voice
+- Voice presets (gentle, professional, playful, flirty, and more)
+- Save and share across all platforms
+
+**Coming Soon:**
+- Sign-to-speech input — sign to the camera and Voca speaks for you in real time
+
+Voca is built on the belief that everyone deserves the ability to express themselves fully — not just clearly, but beautifully, authentically, and emotionally. Voice is our most natural instrument. Voca makes it accessible to everyone.
 
 ## System Architecture
 
