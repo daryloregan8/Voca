@@ -11,26 +11,37 @@ import {
   Platform,
 } from 'react-native';
 import { router } from 'expo-router';
-import { useAuth } from '@/contexts/AuthContext';
+import { useSignIn } from '@clerk/clerk-expo';
 
 export default function SignInScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signIn } = useAuth();
+  const { signIn, setActive, isLoaded } = useSignIn();
 
   const handleSignIn = async () => {
+    if (!isLoaded) return;
+
     if (!email || !password) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
     }
 
     setLoading(true);
-    const { error } = await signIn(email, password);
-    setLoading(false);
+    try {
+      const result = await signIn.create({
+        identifier: email,
+        password,
+      });
 
-    if (error) {
-      Alert.alert('Sign In Failed', error.message);
+      if (result.status === 'complete') {
+        await setActive({ session: result.createdSessionId });
+        router.replace('/(tabs)');
+      }
+    } catch (err: any) {
+      Alert.alert('Sign In Failed', err.errors?.[0]?.message || 'An error occurred');
+    } finally {
+      setLoading(false);
     }
   };
 

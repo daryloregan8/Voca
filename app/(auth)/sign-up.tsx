@@ -11,16 +11,18 @@ import {
   Platform,
 } from 'react-native';
 import { router } from 'expo-router';
-import { useAuth } from '@/contexts/AuthContext';
+import { useSignUp } from '@clerk/clerk-expo';
 
 export default function SignUpScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signUp } = useAuth();
+  const { signUp, setActive, isLoaded } = useSignUp();
 
   const handleSignUp = async () => {
+    if (!isLoaded) return;
+
     if (!email || !password || !confirmPassword) {
       Alert.alert('Error', 'Please fill in all fields');
       return;
@@ -31,28 +33,26 @@ export default function SignUpScreen() {
       return;
     }
 
-    if (password.length < 6) {
-      Alert.alert('Error', 'Password must be at least 6 characters');
+    if (password.length < 8) {
+      Alert.alert('Error', 'Password must be at least 8 characters');
       return;
     }
 
     setLoading(true);
-    const { error } = await signUp(email, password);
-    setLoading(false);
+    try {
+      const result = await signUp.create({
+        emailAddress: email,
+        password,
+      });
 
-    if (error) {
-      Alert.alert('Sign Up Failed', error.message);
-    } else {
-      Alert.alert(
-        'Success',
-        'Account created! Please check your email to verify your account.',
-        [
-          {
-            text: 'OK',
-            onPress: () => router.replace('/(auth)/sign-in'),
-          },
-        ]
-      );
+      if (result.status === 'complete') {
+        await setActive({ session: result.createdSessionId });
+        router.replace('/(tabs)');
+      }
+    } catch (err: any) {
+      Alert.alert('Sign Up Failed', err.errors?.[0]?.message || 'An error occurred');
+    } finally {
+      setLoading(false);
     }
   };
 
