@@ -1,121 +1,53 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
-import { router } from 'expo-router';
-import { useSignUp } from '@clerk/clerk-expo';
+import { SignedIn, SignedOut, useAuth } from '@clerk/clerk-expo';
+import { Link, useRouter } from 'expo-router';
+import { Text, View, StyleSheet, TouchableOpacity } from 'react-native';
+import { useEffect } from 'react';
+import * as WebBrowser from 'expo-web-browser';
+
+WebBrowser.maybeCompleteAuthSession();
 
 export default function SignUpScreen() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const { signUp, setActive, isLoaded } = useSignUp();
+  const { isSignedIn } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (isSignedIn) {
+      router.replace('/(tabs)');
+    }
+  }, [isSignedIn]);
 
   const handleSignUp = async () => {
-    if (!isLoaded) return;
-
-    if (!email || !password || !confirmPassword) {
-      Alert.alert('Error', 'Please fill in all fields');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
-      return;
-    }
-
-    if (password.length < 8) {
-      Alert.alert('Error', 'Password must be at least 8 characters');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const result = await signUp.create({
-        emailAddress: email,
-        password,
-      });
-
-      if (result.status === 'complete') {
-        await setActive({ session: result.createdSessionId });
-        router.replace('/(tabs)');
-      }
-    } catch (err: any) {
-      Alert.alert('Sign Up Failed', err.errors?.[0]?.message || 'An error occurred');
-    } finally {
-      setLoading(false);
-    }
+    // For web, redirect to Clerk's hosted sign-up
+    const signUpUrl = `https://famous-rabbit-76.clerk.accounts.dev/sign-up`;
+    await WebBrowser.openAuthSessionAsync(signUpUrl, 'exp://localhost:8081');
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
-    >
-      <View style={styles.content}>
-        <Text style={styles.title}>Create Account</Text>
-        <Text style={styles.subtitle}>Sign up to get started</Text>
+    <View style={styles.container}>
+      <SignedOut>
+        <View style={styles.content}>
+          <Text style={styles.title}>Create Account</Text>
+          <Text style={styles.subtitle}>Sign up to get started</Text>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          placeholderTextColor="#999"
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-          editable={!loading}
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          placeholderTextColor="#999"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          editable={!loading}
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Confirm Password"
-          placeholderTextColor="#999"
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          secureTextEntry
-          editable={!loading}
-        />
-
-        <TouchableOpacity
-          style={[styles.button, loading && styles.buttonDisabled]}
-          onPress={handleSignUp}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>Sign Up</Text>
-          )}
-        </TouchableOpacity>
-
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Already have an account? </Text>
-          <TouchableOpacity onPress={() => router.push('/(auth)/sign-in')}>
-            <Text style={styles.link}>Sign In</Text>
+          <TouchableOpacity style={styles.button} onPress={handleSignUp}>
+            <Text style={styles.buttonText}>Sign Up with Clerk</Text>
           </TouchableOpacity>
+
+          <View style={styles.footer}>
+            <Text style={styles.footerText}>Already have an account? </Text>
+            <Link href="/(auth)/sign-in" asChild>
+              <TouchableOpacity>
+                <Text style={styles.link}>Sign In</Text>
+              </TouchableOpacity>
+            </Link>
+          </View>
         </View>
-      </View>
-    </KeyboardAvoidingView>
+      </SignedOut>
+
+      <SignedIn>
+        <Text>Redirecting...</Text>
+      </SignedIn>
+    </View>
   );
 }
 
@@ -140,26 +72,13 @@ const styles = StyleSheet.create({
     color: '#666',
     marginBottom: 32,
   },
-  input: {
-    height: 50,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    marginBottom: 16,
-    fontSize: 16,
-    color: '#000',
-  },
   button: {
     height: 50,
-    backgroundColor: '#007AFF',
+    backgroundColor: '#6C47FF',
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 8,
-  },
-  buttonDisabled: {
-    opacity: 0.6,
   },
   buttonText: {
     color: '#fff',
@@ -176,7 +95,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   link: {
-    color: '#007AFF',
+    color: '#6C47FF',
     fontSize: 14,
     fontWeight: '600',
   },
